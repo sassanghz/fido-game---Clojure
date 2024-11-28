@@ -1,7 +1,7 @@
 (ns fido
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
-            [food])) ;; Import food namespace
+            [food])) ;; Properly include the food namespace
 
 ;;-------------------
 ;; THE MENU FUNCTIONS
@@ -21,19 +21,22 @@
 
 ;; Option 1: Display all .txt files
 (defn option1 []
-  (food/list-files)) ; Call the list-files function from food.clj
+  (food/list-files)) ;; Call list-files from food.clj
 
-;; Option 2: Read and display the map
+;; Option 2: Read and display the map, and let Fido find the food
 (defn option2 []
   (print "\nPlease enter a file name => ")
   (flush)
   (let [file-name (read-line)
-        map-data (food/read-map file-name)] ; Call read-map from food.clj
+        map-data (food/read-map file-name)] ;; Call read-map from food.clj
     (when map-data
+      ;; Print the original map
       (println "\nThis is Fido's challenge:")
       (doseq [line map-data]
         (println (apply str line)))
+      ;; Start Fido's search
       (let [updated-map (food/find-food map-data 0 0)]
+        ;; Print the updated map
         (println "\nFinal Map:")
         (doseq [line updated-map]
           (println (apply str line)))))))

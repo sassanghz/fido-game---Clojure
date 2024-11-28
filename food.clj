@@ -25,25 +25,30 @@
         (println "Oops: specified file does not exist")
         nil))))
 
-
 (defn find-food [map-data row col]
   (let [rows (count map-data)
         cols (count (first map-data))]
     (cond
+      ;; Out of bounds
       (or (< row 0) (>= row rows) (< col 0) (>= col cols)) false
+
+      ;; Found the food
       (= (get-in map-data [row col]) \@) (do
-                                           (assoc-in map-data [row col] \+)
                                            (println "\nWoo Hoo - Fido found her food!")
-                                           true)
+                                           (assoc-in map-data [row col] \+))
+
+      ;; hit a wall, already visited, or marked as a dead end
       (or (= (get-in map-data [row col]) \#)
           (= (get-in map-data [row col]) \+)
           (= (get-in map-data [row col]) \!)) false
-      :else ((let [updated-map (assoc-in map-data [row col] \+)];; creates a new map but doe not modify the original
-                (if (or
-                     (find-food updated-map (dec row) col) ;up
-                     (find-food updated-map (inc row) col) ;down
-                     (find-food updated-map row (dec col)) ;left
-                     (find-food updated-map row (inc col))) ;right   
-                     updated-map
-                  (assoc-in updated-map [row col] \!))))))
-  )
+
+      ;; fido going through the open doors
+      :else (let [updated-map (assoc-in map-data [row col] \+)] ;; Mark current cell as part of the path
+              (or
+               ;; moving in all directions
+               (find-food updated-map (dec row) col)   ;; Up
+               (find-food updated-map (inc row) col)   ;; Down
+               (find-food updated-map row (dec col))   ;; Left
+               (find-food updated-map row (inc col))   ;; Right)
+               ;; Mark as dead-end if no path
+               (assoc-in updated-map [row col] \!))))))
