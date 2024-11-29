@@ -23,23 +23,31 @@
 (defn option1 []
   (food/list-files)) ;; Call list-files from food.clj
 
-;; Option 2: Read and display the map, and let Fido find the food
 (defn option2 []
   (print "\nPlease enter a file name => ")
   (flush)
   (let [file-name (read-line)
-        map-data (food/read-map file-name)] ;; Call read-map from food.clj
-    (when map-data
-      ;; Print the original map
-      (println "\nThis is Fido's challenge:")
-      (doseq [line map-data]
-        (println (apply str line)))
-      ;; Start Fido's search
-      (let [updated-map (food/find-food map-data 0 0)]
-        ;; Print the updated map
-        (println "\nFinal Map:")
-        (doseq [line updated-map]
-          (println (apply str line)))))))
+        map-data (food/read-map file-name)]
+    (if map-data
+      (do
+        ;; Display the original map
+        (println "\nThis is Fido's challenge:")
+        (doseq [line map-data]
+          (println (apply str line)))
+
+        ;; Start Fido's search and display the updated map
+        (let [updated-map (food/find-food map-data 0 0)]
+          (doseq [line updated-map]
+            (println (apply str line)))))
+
+      ;; Handle case where the file doesn't exist
+(do
+  (println (str "Oops: specified file " file-name " does not exist")) >   (println "Press any key to continue")
+  (flush)
+  (read-line) ; wait for the user input
+  (print (str (char 27) "[2J")) ; Clear the screen
+  (flush))
+
 
 ;; If the menu selection is valid, call the relevant function
 (defn process-option [option]
